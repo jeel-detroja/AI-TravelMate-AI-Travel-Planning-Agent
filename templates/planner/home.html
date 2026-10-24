@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero rounded-4 p-5 mb-5 text-center">
+  <h1 class="display-5 fw-bold text-navy">Your Journey. Your Budget. Your Adventure.</h1>
+  <p class="lead text-muted mb-4">AI TravelMate builds a personalized day-by-day itinerary from
+    real open map &amp; weather data — tailored to your budget, interests and pace.</p>
+  <a href="{% url 'create_trip' %}" class="btn btn-teal btn-lg text-white px-4">
+    <i class="bi bi-airplane"></i> Plan My Trip</a>
+</section>
+
+<div class="row g-4 mb-5">
+  <div class="col-md-3"><div class="card h-100 shadow-sm border-0 rounded-4 p-3">
+    <i class="bi bi-robot fs-2 text-teal"></i><h5 class="mt-2">AI Planning</h5>
+    <p class="text-muted small mb-0">Smart daily plans, with a rule-based fallback that always works.</p></div></div>
+  <div class="col-md-3"><div class="card h-100 shadow-sm border-0 rounded-4 p-3">
+    <i class="bi bi-cloud-sun fs-2 text-teal"></i><h5 class="mt-2">Live Weather</h5>
+    <p class="text-muted small mb-0">Forecasts from Open-Meteo for your travel dates.</p></div></div>
+  <div class="col-md-3"><div class="card h-100 shadow-sm border-0 rounded-4 p-3">
+    <i class="bi bi-geo-alt fs-2 text-teal"></i><h5 class="mt-2">Real Maps</h5>
+    <p class="text-muted small mb-0">Verified OpenStreetMap attractions on an interactive Leaflet map.</p></div></div>
+  <div class="col-md-3"><div class="card h-100 shadow-sm border-0 rounded-4 p-3">
+    <i class="bi bi-wallet2 fs-2 text-teal"></i><h5 class="mt-2">Budget Aware</h5>
+    <p class="text-muted small mb-0">Transparent, assumption-based cost estimates in your currency.</p></div></div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 p-4">
+  <h4 class="text-navy">How it works</h4>
+  <ol class="text-muted mb-0">
+    <li>Tell us your destination, dates, budget and interests.</li>
+    <li>We resolve your destination and pull verified attractions &amp; weather.</li>
+    <li>AI (or a rule-based planner) arranges them into a daily itinerary.</li>
+    <li>We clearly label what's verified vs estimated — no fake bookings or prices.</li>
+  </ol>
+</div>
+{% endblock %}

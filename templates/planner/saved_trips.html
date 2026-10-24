@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}My Trips · AI TravelMate{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 text-navy mb-0">My trips</h1>
+  <a class="btn btn-teal text-white" href="{% url 'create_trip' %}">Plan a new trip</a>
+</div>
+
+<h2 class="h5 text-navy">Upcoming</h2>
+<div class="row g-3 mb-4">
+  {% for t in upcoming %}
+    <div class="col-md-4"><div class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body">
+      <h5 class="card-title">{{ t.destination }}</h5>
+      <p class="text-muted small mb-2">{{ t.start_date }} → {{ t.end_date }} · {{ t.duration_days }} day(s)</p>
+      <span class="badge bg-secondary">{{ t.get_status_display }}</span>
+      <a class="stretched-link" href="{{ t.get_absolute_url }}" aria-label="Open trip to {{ t.destination }}"></a>
+    </div></div></div>
+  {% empty %}
+    <p class="text-muted">No upcoming trips yet.</p>
+  {% endfor %}
+</div>
+
+<h2 class="h5 text-navy">Past</h2>
+<div class="row g-3">
+  {% for t in past %}
+    <div class="col-md-4"><div class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body">
+      <h5 class="card-title">{{ t.destination }}</h5>
+      <p class="text-muted small mb-2">{{ t.start_date }} → {{ t.end_date }}</p>
+      <a class="stretched-link" href="{{ t.get_absolute_url }}" aria-label="Open trip to {{ t.destination }}"></a>
+    </div></div></div>
+  {% empty %}
+    <p class="text-muted">No past trips.</p>
+  {% endfor %}
+</div>
+{% endblock %}

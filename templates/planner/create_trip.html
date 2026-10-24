@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Plan a Trip · AI TravelMate{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-10">
+    <div class="text-center mb-4">
+      <span class="badge bg-teal-subtle text-teal text-uppercase px-3 py-2 rounded-pill fw-bold mb-2">
+        <i class="bi bi-stars me-1"></i>AI-Powered Itinerary Engine
+      </span>
+      <h1 class="h2 text-navy fw-bold">Plan Your Next Journey</h1>
+      <p class="text-muted">Tell us your dream destination, budget, and travel style. Our AI crafts a verified day-by-day itinerary tailored to your exact tastes.</p>
+    </div>
+
+    <form method="post" novalidate id="trip-form" class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger rounded-3">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <!-- Section 1: Destination & Dates -->
+      <div class="mb-4">
+        <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">
+          <i class="bi bi-geo-alt-fill text-teal me-2"></i>1. Destination & Schedule
+        </h5>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" for="{{ form.destination.id_for_label }}">
+              Destination <span class="text-danger">*</span>
+            </label>
+            {{ form.destination }}
+            <div class="form-text">City, region, or country (e.g. Jaipur, India or Paris, France).</div>
+            {% for e in form.destination.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold" for="{{ form.start_date.id_for_label }}">
+              Start Date <span class="text-danger">*</span>
+            </label>
+            {{ form.start_date }}
+            {% for e in form.start_date.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold" for="{{ form.duration_days.id_for_label }}">
+              Duration (Days) <span class="text-danger">*</span>
+            </label>
+            {{ form.duration_days }}
+            {% for e in form.duration_days.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Budget & Travellers -->
+      <div class="mb-4">
+        <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">
+          <i class="bi bi-wallet2 text-teal me-2"></i>2. Budget & Party Size
+        </h5>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label fw-semibold" for="{{ form.budget.id_for_label }}">
+              Target Budget <span class="text-danger">*</span>
+            </label>
+            {{ form.budget }}
+            <div class="form-text">Your total spending target for this trip.</div>
+            {% for e in form.budget.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold" for="{{ form.currency.id_for_label }}">
+              Currency <span class="text-danger">*</span>
+            </label>
+            {{ form.currency }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold" for="{{ form.travellers.id_for_label }}">
+              Number of Travellers <span class="text-danger">*</span>
+            </label>
+            {{ form.travellers }}
+            {% for e in form.travellers.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Interests -->
+      <div class="mb-4">
+        <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">
+          <i class="bi bi-heart-pulse-fill text-teal me-2"></i>3. What Are You Interested In? <span class="text-danger">*</span>
+        </h5>
+        <p class="small text-muted mb-2">Select all that apply. The planner selects attractions and activities centered on these themes:</p>
+        <div class="interest-checkboxes d-flex flex-wrap gap-2 p-2 rounded-3 bg-light border">
+          {{ form.interests }}
+        </div>
+        {% for e in form.interests.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+      </div>
+
+      <!-- Section 4: Travel Style & Preferences -->
+      <div class="mb-4">
+        <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">
+          <i class="bi bi-sliders2 text-teal me-2"></i>4. Travel Style & Custom Preferences
+        </h5>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Travel Style</label>
+            {{ form.travel_style }}
+            <div class="form-text">Budget backpacker, balanced explorer, or luxury premium.</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Daily Pace</label>
+            {{ form.pace }}
+            <div class="form-text">Relaxed (2-3 stops), Moderate (3-4), Packed (5+).</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Companions</label>
+            {{ form.companion }}
+            <div class="form-text">Solo, romantic couple, family with kids, or friends.</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Dietary Needs <span class="text-muted fw-normal">(Optional)</span></label>
+            {{ form.dietary }}
+            <div class="form-text">e.g. Vegetarian, Halal, Vegan, Gluten-Free, Jain.</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Accessibility <span class="text-muted fw-normal">(Optional)</span></label>
+            {{ form.accessibility }}
+            <div class="form-text">e.g. Wheelchair, minimal stairs, stroller-friendly.</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Max Activities/Day <span class="text-muted fw-normal">(Optional)</span></label>
+            {{ form.max_activities }}
+            <div class="form-text">Leave blank for pace-optimized default.</div>
+            {% for e in form.max_activities.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-3 border-top text-center text-md-start d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+          <button class="btn btn-teal text-white px-5 py-2 fs-6 rounded-pill fw-bold shadow-sm" type="submit" id="submit-btn">
+            <span class="spinner-border spinner-border-sm d-none me-2" id="spin"></span>
+            <span id="submit-label"><i class="bi bi-magic me-2"></i>Generate Itinerary</span>
+          </button>
+        </div>
+        <div class="small text-muted">
+          <i class="bi bi-shield-check text-success me-1"></i>Weather, real POIs, and route distances computed live.
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/itinerary.js' %}"></script>
+{% endblock %}

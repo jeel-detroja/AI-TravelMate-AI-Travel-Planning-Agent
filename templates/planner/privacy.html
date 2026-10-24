@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Privacy · AI TravelMate{% endblock %}
+{% block content %}
+<h1 class="h3 text-navy mb-3">Privacy</h1>
+<p>We store your account details and the trips you create so you can view them later. Trips are only visible to you.</p>
+<p>To build an itinerary, your destination text is sent to OpenStreetMap's Nominatim, approximate coordinates are sent to Overpass and Open-Meteo,
+and — only if the optional Gemini provider is enabled — your trip preferences and a list of public place names are sent to Google Gemini.
+No password or personal contact details are sent to these services.</p>
+<p>You can delete any trip at any time from its page.</p>
+{% endblock %}

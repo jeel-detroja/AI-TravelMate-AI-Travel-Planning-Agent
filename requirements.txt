@@ -1,0 +1,9 @@
+Django>=5.1,<5.3
+requests>=2.32
+python-dotenv>=1.0
+dj-database-url>=2.2
+gunicorn>=22.0
+whitenoise>=6.7
+# PostgreSQL driver (only needed if DATABASE_URL points to Postgres):
+# psycopg[binary]>=3.2
+google-genai>=1.0

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Not found · AI TravelMate{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <h1 class="display-4 text-navy">404</h1>
+  <p class="lead text-muted">We couldn't find that page.</p>
+  <a class="btn btn-teal text-white" href="{% url 'home' %}">Back home</a>
+</div>
+{% endblock %}

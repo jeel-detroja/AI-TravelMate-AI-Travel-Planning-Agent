@@ -1,0 +1,35 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-navy" href="{% url 'home' %}">
+      <i class="bi bi-compass-fill text-teal"></i> AI TravelMate
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"
+            aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'how_it_works' %}">How It Works</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
+        {% if user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'saved_trips' %}">My Trips</a></li>
+          <li class="nav-item"><a class="btn btn-teal text-white ms-lg-2" href="{% url 'create_trip' %}">Plan My Trip</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ user.username }}</a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <form method="post" action="{% url 'logout' %}">{% csrf_token %}
+                  <button class="dropdown-item" type="submit">Log out</button>
+                </form>
+              </li>
+            </ul>
+          </li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+          <li class="nav-item"><a class="btn btn-teal text-white ms-lg-2" href="{% url 'signup' %}">Sign up</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>

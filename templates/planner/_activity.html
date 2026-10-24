@@ -1,0 +1,77 @@
+<div class="activity-card card border-0 shadow-sm rounded-4 mb-3 p-3 transition-card"
+     data-activity-focus data-lat="{{ a.latitude }}" data-lon="{{ a.longitude }}">
+  <div class="d-flex justify-content-between align-items-start mb-2">
+    <div>
+      {% if a.suggested_time %}
+        <span class="badge bg-teal-subtle text-teal fw-semibold me-1">
+          <i class="bi bi-clock me-1"></i>{{ a.suggested_time }}
+        </span>
+      {% endif %}
+      <span class="badge bg-light text-dark border">
+        ~{{ a.duration_minutes }} min
+      </span>
+      <span class="badge bg-secondary-subtle text-secondary ms-1">
+        {{ a.category }}
+      </span>
+    </div>
+    <div class="text-end">
+      {% if a.estimated_cost and a.estimated_cost > 0 %}
+        <span class="badge bg-primary-subtle text-primary fw-bold">
+          ~{{ a.estimated_cost }} {{ a.cost_currency }}
+        </span>
+      {% else %}
+        <span class="badge bg-success-subtle text-success fw-semibold">
+          Free / Included
+        </span>
+      {% endif %}
+    </div>
+  </div>
+
+  <h6 class="fw-bold text-navy mb-1">{{ a.activity }}</h6>
+  {% if a.name and a.name != a.activity %}
+    <div class="small text-muted fw-semibold mb-2">
+      <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ a.name }}
+    </div>
+  {% endif %}
+
+  {% if a.description %}
+    <p class="small text-secondary mb-2 lh-sm">{{ a.description }}</p>
+  {% endif %}
+
+  {% if a.insider_tip %}
+    <div class="tip-box small p-2 rounded-3 mb-2 bg-teal-subtle text-teal-dark">
+      <i class="bi bi-lightbulb-fill text-warning me-1"></i><strong>Tip:</strong> {{ a.insider_tip }}
+    </div>
+  {% endif %}
+
+  <div class="d-flex flex-wrap align-items-center justify-content-between pt-1 gap-2 border-top">
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-outline-teal btn-xs py-1 px-2 rounded-pill" style="font-size: 11px;">
+        <i class="bi bi-pin-map me-1"></i>View on Map
+      </button>
+      {% if a.route_to_next and a.route_to_next.nav_url != '#' %}
+        <a href="{{ a.route_to_next.nav_url }}" target="_blank" rel="noopener"
+           class="btn btn-outline-primary btn-xs py-1 px-2 rounded-pill text-decoration-none" style="font-size: 11px;">
+          <i class="bi bi-signpost-2 me-1"></i>Directions
+        </a>
+      {% endif %}
+    </div>
+    {% if a.latitude and a.longitude %}
+      <a class="small text-muted text-decoration-none" target="_blank" rel="noopener" style="font-size: 11px;"
+         href="https://www.openstreetmap.org/?mlat={{ a.latitude }}&amp;mlon={{ a.longitude }}#map=16/{{ a.latitude }}/{{ a.longitude }}">
+        OSM <i class="bi bi-box-arrow-up-right" style="font-size: 9px;"></i>
+      </a>
+    {% endif %}
+  </div>
+
+  {% if a.route_to_next %}
+    <div class="route-connector mt-3 pt-2 text-center border-top border-dashed">
+      <div class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill bg-light border small text-muted">
+        <i class="bi {{ a.route_to_next.icon|default:'bi-arrow-down' }} text-teal"></i>
+        <span>{{ a.route_to_next.badge }}</span>
+        <i class="bi bi-arrow-right text-muted mx-1"></i>
+        <strong class="text-dark">{{ a.route_to_next.to_name }}</strong>
+      </div>
+    </div>
+  {% endif %}
+</div>

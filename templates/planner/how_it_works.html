@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}How it works · AI TravelMate{% endblock %}
+{% block content %}
+<h1 class="h3 text-navy mb-4">How it works</h1>
+<div class="row g-3">
+  <div class="col-md-6"><div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+    <h5>1. You describe the trip</h5><p class="text-muted mb-0">Destination, dates, budget, travellers, interests, style and pace.</p></div></div>
+  <div class="col-md-6"><div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+    <h5>2. We gather verified data</h5><p class="text-muted mb-0">The destination is geocoded, real attractions are fetched from OpenStreetMap, and the forecast comes from Open-Meteo.</p></div></div>
+  <div class="col-md-6"><div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+    <h5>3. A planner arranges the days</h5><p class="text-muted mb-0">Gemini (if configured) or a deterministic rule-based planner organises places into morning, afternoon and evening. The AI may only choose from verified places; its output is validated by the server.</p></div></div>
+  <div class="col-md-6"><div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+    <h5>4. You get a clear, labelled plan</h5><p class="text-muted mb-0">Costs are computed on the server from stated assumptions, never taken from the AI.</p></div></div>
+</div>
+{% endblock %}

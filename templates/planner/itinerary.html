@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ trip.destination }} · Personalized Itinerary{% endblock %}
+
+{% block content %}
+<div class="itinerary-header card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+        <h1 class="h2 text-navy fw-bold mb-0">{{ trip.resolved_name|default:trip.destination }}</h1>
+        <span class="badge bg-teal-subtle text-teal text-uppercase px-3 py-2 rounded-pill fw-bold" style="font-size: 11px;">
+          <i class="bi bi-stars me-1"></i>{{ itinerary.generator|default:"Smart AI" }}
+        </span>
+        {% if itinerary.status == "partial" %}
+          <span class="badge bg-warning-subtle text-warning px-2 py-1 rounded-pill">Partial</span>
+        {% endif %}
+      </div>
+      <p class="text-muted mb-2">
+        <i class="bi bi-calendar3 me-1"></i>{{ trip.start_date }} → {{ trip.end_date }} ·
+        <i class="bi bi-clock-history me-1"></i>{{ trip.duration_days }} day(s) ·
+        <i class="bi bi-people me-1"></i>{{ trip.travellers }} traveller(s) ({{ trip.companion|title }})
+      </p>
+      <div class="d-flex flex-wrap gap-2">
+        <span class="badge bg-light text-dark border"><i class="bi bi-speedometer2 me-1"></i>{{ trip.pace|title }} Pace</span>
+        <span class="badge bg-light text-dark border"><i class="bi bi-wallet2 me-1"></i>{{ trip.travel_style|title }} Style</span>
+        {% for interest in trip.interests %}
+          <span class="badge bg-teal-subtle text-teal"><i class="bi bi-tag me-1"></i>{{ interest|title }}</span>
+        {% endfor %}
+        {% if trip.preferences.dietary %}
+          <span class="badge bg-success-subtle text-success"><i class="bi bi-egg-fried me-1"></i>Dietary: {{ trip.preferences.dietary }}</span>
+        {% endif %}
+        {% if trip.preferences.accessibility %}
+          <span class="badge bg-info-subtle text-info"><i class="bi bi-universal-access me-1"></i>{{ trip.preferences.accessibility }}</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+      <button onclick="window.print()" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+        <i class="bi bi-printer me-1"></i>Print
+      </button>
+      <a href="{% url 'create_trip' %}" class="btn btn-outline-teal btn-sm rounded-pill px-3">
+        <i class="bi bi-plus-circle me-1"></i>New trip
+      </a>
+      <form method="post" action="{% url 'regenerate_trip' trip.pk %}">{% csrf_token %}
+        <button class="btn btn-teal text-white btn-sm rounded-pill px-3">
+          <i class="bi bi-arrow-clockwise me-1"></i>Regenerate
+        </button>
+      </form>
+      <form method="post" action="{% url 'delete_trip' trip.pk %}"
+            onsubmit="return confirm('Permanently delete this trip itinerary?');">{% csrf_token %}
+        <button class="btn btn-outline-danger btn-sm rounded-pill px-3">
+          <i class="bi bi-trash3 me-1"></i>Delete
+        </button>
+      </form>
+    </div>
+  </div>
+
+  {% if itinerary.data.trip_summary %}
+    <div class="mt-3 p-3 bg-light rounded-3 text-secondary border-start border-4 border-teal">
+      <i class="bi bi-quote fs-5 text-teal me-1"></i>{{ itinerary.data.trip_summary }}
+    </div>
+  {% endif %}
+</div>
+
+{% if itinerary %}
+  {% if itinerary.warnings %}
+    <div class="alert alert-warning border-0 shadow-sm rounded-4 mb-4">
+      <div class="d-flex align-items-center mb-1">
+        <i class="bi bi-exclamation-triangle-fill text-warning me-2 fs-5"></i>
+        <strong>Trip Advisor Notes:</strong>
+      </div>
+      <ul class="mb-0 ps-3 small">
+        {% for w in itinerary.warnings %}
+          <li>{{ w }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <!-- Budget Overview Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
+        <div class="small text-muted mb-1"><i class="bi bi-wallet2 me-1"></i>Total Budget</div>
+        <div class="h4 fw-bold text-navy mb-0">{{ budget.currency_symbol }}{{ budget.total_budget }}</div>
+        <div class="small text-muted">{{ budget.currency }} target</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
+        <div class="small text-muted mb-1"><i class="bi bi-calculator me-1"></i>Estimated Total</div>
+        <div class="h4 fw-bold text-teal mb-0">{{ budget.currency_symbol }}{{ budget.estimated }}</div>
+        <div class="small text-muted">All categories included</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
+        <div class="small text-muted mb-1"><i class="bi bi-piggy-bank me-1"></i>Budget Buffer</div>
+        <div class="h4 fw-bold {% if budget.over_budget %}text-danger{% else %}text-success{% endif %} mb-0">
+          {{ budget.currency_symbol }}{{ budget.remaining }}
+        </div>
+        <div class="small">
+          <span class="badge bg-{{ budget.badge_class }}-subtle text-{{ budget.badge_class }}">
+            {{ budget.status_label }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
+        <div class="small text-muted mb-1"><i class="bi bi-pie-chart me-1"></i>Planned Breakdown</div>
+        <div class="small">
+          <div>Stay: <strong>{{ budget.currency_symbol }}{{ itinerary.data.breakdown.accommodation|default:"-" }}</strong></div>
+          <div>Food: <strong>{{ budget.currency_symbol }}{{ itinerary.data.breakdown.food|default:"-" }}</strong></div>
+          <div>Transit: <strong>{{ budget.currency_symbol }}{{ itinerary.data.breakdown.transportation|default:"-" }}</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if budget.advice %}
+    <div class="p-3 bg-white rounded-4 shadow-sm mb-4 small text-muted d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle text-teal fs-5"></i>
+      <div>{{ budget.advice }} <span class="text-secondary">({{ itinerary.data.assumptions }})</span></div>
+    </div>
+  {% endif %}
+
+  <!-- Interactive Map with Day Filters -->
+  <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden bg-white">
+    <div class="card-body p-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div class="fw-bold text-navy">
+        <i class="bi bi-map-fill text-teal me-2"></i>Interactive Route & POI Map
+      </div>
+      <div class="d-flex flex-wrap gap-1" id="map-day-filters">
+        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill active px-3" data-filter-day="all">
+          All Days
+        </button>
+        {% for day in itinerary.data.days %}
+          <button type="button" class="btn btn-sm btn-outline-teal rounded-pill px-3" data-filter-day="{{ day.day_number }}">
+            Day {{ day.day_number }}
+          </button>
+        {% endfor %}
+      </div>
+    </div>
+    <div id="map" style="height: 420px; width: 100%;"></div>
+    <div class="p-2 bg-light text-center small text-muted border-top">
+      <i class="bi bi-hand-index-thumb me-1"></i>Tip: Click any activity below to zoom into that location on the map.
+    </div>
+  </div>
+
+  <!-- Day-by-Day Timeline -->
+  <h3 class="h4 text-navy fw-bold mb-3"><i class="bi bi-calendar2-week me-2 text-teal"></i>Day-by-Day Itinerary</h3>
+
+  {% for day in itinerary.data.days %}
+    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden" id="day-card-{{ day.day_number }}">
+      <div class="card-header bg-navy text-white p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+          <span class="badge bg-teal text-white rounded-pill px-3 py-1 me-2 fw-bold">Day {{ day.day_number }}</span>
+          <span class="fw-bold fs-6">{{ day.title|default:"City Exploration" }}</span>
+        </div>
+        <div class="small text-white-50">
+          <i class="bi bi-cash-stack me-1"></i>Est. day cost: <strong>{{ budget.currency_symbol }}{{ day.daily_estimated_cost }} {{ trip.currency }}</strong>
+          {% if day.route_summary and day.route_summary.total_distance_km > 0 %}
+            · <i class="bi bi-signpost-split me-1"></i>~{{ day.route_summary.total_distance_km }} km transit
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card-body p-4">
+        {% if day.weather_note %}
+          <div class="alert alert-light border rounded-3 p-2 mb-3 small d-flex align-items-center gap-2">
+            <i class="bi bi-cloud-sun text-teal fs-5"></i>
+            <div><strong>Weather Insight:</strong> {{ day.weather_note }}</div>
+          </div>
+        {% endif %}
+
+        <div class="row g-3">
+          <!-- Morning -->
+          <div class="col-lg-4">
+            <div class="slot-header mb-3 pb-1 border-bottom d-flex align-items-center justify-content-between">
+              <span class="fw-bold text-teal text-uppercase small"><i class="bi bi-sunrise me-1"></i>Morning</span>
+              <span class="badge bg-light text-muted border small">{{ day.morning|length }} stop(s)</span>
+            </div>
+            {% for a in day.morning %}
+              {% include "planner/_activity.html" %}
+            {% empty %}
+              <div class="p-3 text-center text-muted bg-light rounded-3 small">
+                <i class="bi bi-cup-hot fs-4 d-block mb-1 text-secondary"></i>
+                Leisurely morning / Free time to relax or explore nearby.
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Afternoon -->
+          <div class="col-lg-4">
+            <div class="slot-header mb-3 pb-1 border-bottom d-flex align-items-center justify-content-between">
+              <span class="fw-bold text-teal text-uppercase small"><i class="bi bi-sun me-1"></i>Afternoon</span>
+              <span class="badge bg-light text-muted border small">{{ day.afternoon|length }} stop(s)</span>
+            </div>
+            {% for a in day.afternoon %}
+              {% include "planner/_activity.html" %}
+            {% empty %}
+              <div class="p-3 text-center text-muted bg-light rounded-3 small">
+                <i class="bi bi-compass fs-4 d-block mb-1 text-secondary"></i>
+                Free afternoon for shopping or personal discoveries.
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Evening -->
+          <div class="col-lg-4">
+            <div class="slot-header mb-3 pb-1 border-bottom d-flex align-items-center justify-content-between">
+              <span class="fw-bold text-teal text-uppercase small"><i class="bi bi-moon-stars me-1"></i>Evening</span>
+              <span class="badge bg-light text-muted border small">{{ day.evening|length }} stop(s)</span>
+            </div>
+            {% for a in day.evening %}
+              {% include "planner/_activity.html" %}
+            {% empty %}
+              <div class="p-3 text-center text-muted bg-light rounded-3 small">
+                <i class="bi bi-stars fs-4 d-block mb-1 text-secondary"></i>
+                Relaxing evening at local cafes or leisurely promenade.
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Dining & Local Recommendations -->
+        {% if day.dining_recommendations %}
+          <div class="mt-4 p-3 bg-light rounded-3">
+            <h6 class="fw-bold text-navy mb-2"><i class="bi bi-egg-fried text-teal me-2"></i>Curated Dining Recommendations</h6>
+            <div class="row g-2">
+              {% for d in day.dining_recommendations %}
+                <div class="col-md-6 col-lg-4">
+                  <div class="card border-0 bg-white p-2 rounded-3 shadow-xs h-100">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <strong class="small text-navy">{{ d.name }}</strong>
+                      <span class="badge bg-secondary-subtle text-secondary" style="font-size: 10px;">{{ d.meal|default:"Meal" }}</span>
+                    </div>
+                    <div class="small text-muted">{{ d.cuisine|default:"Local specialties" }}</div>
+                    {% if d.dietary_notes %}
+                      <div class="small text-teal mt-1" style="font-size: 11px;">
+                        <i class="bi bi-check-circle me-1"></i>{{ d.dietary_notes }}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+
+        {% if day.tips %}
+          <div class="mt-3 small text-muted">
+            <strong class="text-dark"><i class="bi bi-lightbulb me-1 text-warning"></i>Day Highlights:</strong>
+            {{ day.tips|join:" · " }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+
+  <!-- Weather 16-Day Forecast -->
+  {% if itinerary.data.weather.available %}
+    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white">
+      <div class="card-body p-4">
+        <h5 class="text-navy fw-bold mb-3"><i class="bi bi-cloud-sun-fill text-teal me-2"></i>16-Day Weather Outlook</h5>
+        <div class="row g-2">
+          {% for d in itinerary.data.weather.days %}
+            <div class="col-6 col-md-3 col-lg-2">
+              <div class="card border p-2 text-center rounded-3 h-100 bg-light">
+                <div class="fw-bold small text-navy">{{ d.date }}</div>
+                <div class="my-1"><i class="bi {{ d.icon|default:'bi-cloud' }} text-teal fs-4"></i></div>
+                <div class="small text-dark fw-semibold">{{ d.summary }}</div>
+                <div class="small text-muted">{{ d.t_min }}°C / {{ d.t_max }}°C</div>
+                <div class="small text-teal" style="font-size: 11px;">
+                  <i class="bi bi-droplet-fill me-1"></i>{{ d.precip_prob }}% rain
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <p class="small text-muted mt-3 mb-0">{{ itinerary.data.weather.attribution }}</p>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Packing & Travel Tips -->
+  {% if itinerary.data.packing_and_safety_tips %}
+    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white p-4">
+      <h5 class="text-navy fw-bold mb-2"><i class="bi bi-shield-check text-teal me-2"></i>Local Customs & Packing Advice</h5>
+      <ul class="mb-0 text-secondary ps-3 small">
+        {% for tip in itinerary.data.packing_and_safety_tips %}
+          <li class="mb-1">{{ tip }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+{% else %}
+  <div class="alert alert-danger rounded-4 p-4 text-center">
+    <i class="bi bi-exclamation-octagon-fill fs-2 d-block mb-2 text-danger"></i>
+    <h4 class="alert-heading">Generation Error</h4>
+    <p>This trip could not be generated. Please try again with a nearby city or check your internet connectivity.</p>
+    <a href="{% url 'create_trip' %}" class="btn btn-teal text-white rounded-pill px-4">Create New Trip</a>
+  </div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+{{ markers|json_script:"map-markers" }}
+{{ routes|json_script:"map-routes" }}
+{{ center|json_script:"map-center" }}
+<script src="{% static 'js/map.js' %}"></script>
+{% endblock %}

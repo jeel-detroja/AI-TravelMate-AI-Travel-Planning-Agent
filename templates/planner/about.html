@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}About · AI TravelMate{% endblock %}
+{% block content %}
+<h1 class="h3 text-navy mb-3">About AI TravelMate</h1>
+<p>AI TravelMate is an AI-powered travel planning assistant. Give it a destination, dates, budget and interests,
+and it produces a day-by-day itinerary with a map, weather forecast and a budget estimate.</p>
+<h2 class="h5 text-navy mt-4">Data sources</h2>
+<ul>
+  <li><strong>Nominatim (OpenStreetMap)</strong> — destination lookup.</li>
+  <li><strong>Overpass API (OpenStreetMap)</strong> — real attractions near the destination.</li>
+  <li><strong>Open-Meteo</strong> — daily weather forecast.</li>
+  <li><strong>Google Gemini (optional)</strong> — arranges verified places into a plan; a rule-based planner is used otherwise.</li>
+</ul>
+<h2 class="h5 text-navy mt-4">Honest limitations</h2>
+<ul>
+  <li>Costs are rough, assumption-based estimates — not live prices or bookings.</li>
+  <li>Opening hours, ticket prices, traffic and availability are not provided.</li>
+  <li>Weather is only available for about 16 days ahead.</li>
+  <li>Place coverage depends on how well OpenStreetMap maps the area.</li>
+</ul>
+{% endblock %}
